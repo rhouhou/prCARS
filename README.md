@@ -272,7 +272,7 @@ If you use this package in published work, please cite:
 @software{prcars,
   author  = {Dr. Rola Houhou},
   title   = {prcars: CARS spectral retrieval in Python},
-  year    = {2025},
+  year    = {2026},
   url     = {https://github.com/rhouhou/prcars},
 }
 ```
