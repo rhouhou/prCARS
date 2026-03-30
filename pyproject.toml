@@ -1,0 +1,80 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.backends.legacy:build"
+
+[project]
+name = "prcars"
+version = "0.1.0"
+description = "CARS spectral retrieval: Kramers-Kronig, Maximum Entropy Method, and Neural Networks"
+readme = "README.md"
+license = { file = "LICENSE" }
+requires-python = ">=3.10"
+authors = [{ name = "Dr. Rola Houhou", email = "rola.h.houhou@gmail.com" }]
+keywords = ["CARS", "Raman", "spectroscopy", "nonlinear optics",
+            "Kramers-Kronig", "maximum entropy", "deep learning"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Scientific/Engineering :: Physics",
+    "Topic :: Scientific/Engineering :: Chemistry",
+]
+
+dependencies = [
+    "numpy>=1.24",
+    "scipy>=1.10",
+]
+
+[project.optional-dependencies]
+wavelet = ["PyWavelets>=1.4"]
+torch   = ["torch>=2.0"]
+tf      = ["tensorflow>=2.12"]
+plot    = ["matplotlib>=3.7"]
+dev     = [
+    "pytest>=7",
+    "pytest-cov",
+    "ruff",
+    "mypy",
+    "pre-commit",
+    "matplotlib>=3.7",
+    "PyWavelets>=1.4",
+]
+all = [
+    "prcars[wavelet,plot]",
+]
+
+[project.urls]
+Homepage   = "https://github.com/rhouhou/prcars"
+Repository = "https://github.com/rhouhou/prcars"
+Issues     = "https://github.com/rhouhou/prcars/issues"
+Changelog  = "https://github.com/rhouhou/prcars/blob/main/CHANGELOG.md"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["prcars*"]
+
+[tool.setuptools.package-data]
+"prcars.networks" = ["*.pt", "*.h5", "*.keras"]
+
+# ── ruff (linting) ────────────────────────────────────────────────────────────
+[tool.ruff]
+line-length = 99
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "UP", "B", "C4", "PIE", "RUF"]
+ignore = ["E501"]
+
+# ── pytest ────────────────────────────────────────────────────────────────────
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts   = "--tb=short -q"
+
+# ── mypy ──────────────────────────────────────────────────────────────────────
+[tool.mypy]
+python_version = "3.10"
+ignore_missing_imports = true
