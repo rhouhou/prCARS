@@ -47,7 +47,7 @@ pip install "prcars[wavelet,plot]"
 
 ```python
 import numpy as np
-import cars_analysis as ca
+import prcars as ca
 
 # load your data
 wavenumbers = np.load("wavenumbers.npy")   # cm⁻¹
@@ -103,7 +103,7 @@ result = ca.retrieve(
 
 ```python
 # download bundled weights once
-import cars_analysis.networks as nets
+import prcars.networks as nets
 nets.download_weights()
 
 result = ca.retrieve(
@@ -120,7 +120,7 @@ result = ca.retrieve(
 ### Neural Network – fine-tune on your own data
 
 ```python
-from cars_analysis import NeuralNetRetriever
+from prcars import NeuralNetRetriever
 
 nn = NeuralNetRetriever(model_name="cars_unet_v1")
 
@@ -174,7 +174,7 @@ denoised     = result.intermediate["after_denoise"]
 ## Benchmarking against ground truth
 
 ```python
-from cars_analysis.utils import synthetic_cars, benchmark, compare_plot
+from prcars.utils import synthetic_cars, benchmark, compare_plot
 
 wn, cars, im_true = synthetic_cars()
 
@@ -215,11 +215,11 @@ Set `phase_matching=None` (default) to skip (appropriate for tight focusing).
 
 ## Adding your own pretrained model
 
-Drop a `.pt` (PyTorch) or `.h5` (Keras) file into `~/.cars_analysis/models/`
+Drop a `.pt` (PyTorch) or `.h5` (Keras) file into `~/.prcars/models/`
 and pass its stem as `model_name`:
 
 ```python
-# file: ~/.cars_analysis/models/my_awesome_model.pt
+# file: ~/.prcars/models/my_awesome_model.pt
 result = ca.retrieve(wn, cars,
                      method="nn",
                      retriever_kw={"model_name": "my_awesome_model"})
@@ -230,7 +230,7 @@ result = ca.retrieve(wn, cars,
 ## Project structure
 
 ```
-cars_analysis/
+prcars/
 ├── __init__.py          # public API
 ├── pipeline.py          # Pipeline orchestrator + retrieve()
 ├── result.py            # CARSResult dataclass
