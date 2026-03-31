@@ -8,7 +8,7 @@ version = "0.1.0"
 description = "CARS spectral retrieval: Kramers-Kronig, Maximum Entropy Method, and Neural Networks"
 readme = "README.md"
 license = { file = "LICENSE" }
-requires-python = ">=3.10"
+requires-python = ">=3.9.6"
 authors = [{ name = "Dr. Rola Houhou", email = "rola.h.houhou@gmail.com" }]
 keywords = ["CARS", "Raman", "spectroscopy", "nonlinear optics",
             "Kramers-Kronig", "maximum entropy", "deep learning"]
@@ -34,6 +34,7 @@ wavelet = ["PyWavelets>=1.4"]
 torch   = ["torch>=2.0"]
 tf      = ["tensorflow>=2.12"]
 plot    = ["matplotlib>=3.7"]
+test    = ["pytest>=7", "pytest-cov"] 
 dev     = [
     "pytest>=7",
     "pytest-cov",
@@ -43,8 +44,15 @@ dev     = [
     "matplotlib>=3.7",
     "PyWavelets>=1.4",
 ]
-all = [
-    "prcars[wavelet,plot]",
+dev-torch = [
+    "pytest>=7",
+    "pytest-cov",
+    "ruff",
+    "mypy",
+    "pre-commit",
+    "matplotlib>=3.7",
+    "PyWavelets>=1.4",
+    "torch>=2.0",
 ]
 
 [project.urls]

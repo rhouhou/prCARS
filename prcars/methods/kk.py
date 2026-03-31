@@ -90,14 +90,11 @@ class KramersKronig:
             Keys: ``wavenumbers``, ``amplitude``, ``phase``,
             ``im_chi3``, ``re_chi3``.
         """
-        wn = self._to_uniform(wavenumbers, intensity)
-        I = np.maximum(intensity, 0.0)
+        wn, I = self._to_uniform(wavenumbers, intensity)
+        I = np.maximum(I, 0.0)
 
         if nr_background is not None:
-            bg_u = interpolate.interp1d(
-                wavenumbers, nr_background,
-                bounds_error=False, fill_value="extrapolate"
-            )(wn)
+            _, bg_u = self._to_uniform(wavenumbers, nr_background)
             ratio = I / np.maximum(bg_u, 1e-30)
         else:
             ratio = I
@@ -123,20 +120,24 @@ class KramersKronig:
             "amplitude":   amplitude,
             "phase":       phase,
             "im_chi3":     amplitude * np.sin(phase),
-            "re_chi3":     amplitude * np.cos(phase),
+            "re_chi3":     amplitude * np.cos(phase) - 1.0,
         }
 
     # ── internals ─────────────────────────────────────────────────────────────
     @staticmethod
-    def _to_uniform(wn: np.ndarray, I: np.ndarray) -> np.ndarray:
+    def _to_uniform(wn: np.ndarray, y: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
         diffs = np.diff(wn)
         if np.std(diffs) / (np.abs(np.mean(diffs)) + 1e-30) < 1e-3:
-            return wn
+            return wn, y
         warnings.warn(
             "KK: wavenumber axis is not uniform – interpolating to uniform grid.",
             stacklevel=3,
         )
-        return np.linspace(wn[0], wn[-1], len(wn))
+        wn_u = np.linspace(wn[0], wn[-1], len(wn))
+        y_u = interpolate.interp1d(
+            wn, y, bounds_error=False, fill_value="extrapolate"
+        )(wn_u)
+        return wn_u, y_u
 
     def _phase_fft(self, log_amplitude: np.ndarray) -> np.ndarray:
         """FFT-based Hilbert transform (O(N log N))."""
@@ -145,7 +146,7 @@ class KramersKronig:
         padded = np.zeros(n_pad)
         padded[:n] = log_amplitude
         analytic = signal.hilbert(padded)
-        return np.imag(analytic)[:n]
+        return -np.imag(analytic)[:n]
 
     @staticmethod
     def _phase_direct(wn: np.ndarray, log_amplitude: np.ndarray) -> np.ndarray:
@@ -159,7 +160,7 @@ class KramersKronig:
                 wn * log_amplitude / (wn ** 2 - w0 ** 2 + 1e-30),
                 0.0,
             )
-            phi[i] = (2.0 / np.pi) * np.trapz(integrand, wn)
+            phi[i] = (2.0 / np.pi) * np.trapezoid(integrand, wn)
         return phi
 
     def __repr__(self) -> str:

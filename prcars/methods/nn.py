@@ -80,6 +80,7 @@ def _build_unet_torch(in_channels: int = 1, depth: int = 4):
     """1-D U-Net implemented in PyTorch."""
     import torch
     import torch.nn as nn
+    import torch.nn.functional as F
 
     class ConvBlock(nn.Module):
         def __init__(self, ch_in, ch_out):
@@ -92,48 +93,66 @@ def _build_unet_torch(in_channels: int = 1, depth: int = 4):
                 nn.BatchNorm1d(ch_out),
                 nn.ReLU(inplace=True),
             )
+
         def forward(self, x):
             return self.net(x)
 
     class UNet1D(nn.Module):
         def __init__(self, depth=4, base_ch=32):
             super().__init__()
-            chs = [base_ch * 2 ** i for i in range(depth)]
-            # encoder
-            self.enc   = nn.ModuleList([ConvBlock(1 if i == 0 else chs[i-1], chs[i])
-                                        for i in range(depth)])
-            self.pool  = nn.ModuleList([nn.MaxPool1d(2) for _ in range(depth - 1)])
-            # bottleneck
-            self.bot   = ConvBlock(chs[-1], chs[-1] * 2)
-            # decoder
-            self.up    = nn.ModuleList([nn.ConvTranspose1d(chs[-1] * 2 if i == 0
-                                        else chs[depth - 1 - i + 1],
-                                        chs[depth - 1 - i], 2, stride=2)
-                                        for i in range(depth)])
-            self.dec   = nn.ModuleList([ConvBlock(chs[depth - 1 - i] * 2,
-                                        chs[depth - 1 - i])
-                                        for i in range(depth)])
-            self.head  = nn.Conv1d(chs[0], 1, 1)
+            chs = [base_ch * 2 ** i for i in range(depth)]   # [32, 64, 128, 256]
+
+            # Encoder
+            self.enc = nn.ModuleList(
+                [ConvBlock(in_channels if i == 0 else chs[i - 1], chs[i])
+                 for i in range(depth)]
+            )
+            self.pool = nn.ModuleList([nn.MaxPool1d(2) for _ in range(depth - 1)])
+
+            # Bottleneck
+            self.bot = ConvBlock(chs[-1], chs[-1] * 2)       # 256 -> 512
+
+            # Decoder uses only the stored skip connections from enc[:-1]
+            skip_chs = chs[:-1][::-1]                        # [128, 64, 32]
+            up_in_chs = [chs[-1] * 2] + [chs[-1 - i] for i in range(1, depth - 1)]
+            # for depth=4: [512, 256, 128]
+            up_out_chs = skip_chs                            # [128, 64, 32]
+
+            self.up = nn.ModuleList([
+                nn.ConvTranspose1d(ch_in, ch_out, 2, stride=2)
+                for ch_in, ch_out in zip(up_in_chs, up_out_chs)
+            ])
+
+            self.dec = nn.ModuleList([
+                ConvBlock(ch_out + skip, ch_out)
+                for ch_out, skip in zip(up_out_chs, skip_chs)
+            ])
+            # For depth=4:
+            # up:  512->128, 256->64, 128->32
+            # dec: (128+128)->128, (64+64)->64, (32+32)->32
+
+            self.head = nn.Conv1d(chs[0], 1, 1)
 
         def forward(self, x):
             skips = []
-            for i, (enc, pool) in enumerate(zip(self.enc[:-1], self.pool)):
+            for enc, pool in zip(self.enc[:-1], self.pool):
                 x = enc(x)
                 skips.append(x)
                 x = pool(x)
+
             x = self.enc[-1](x)
             x = self.bot(x)
+
             for up, dec, skip in zip(self.up, self.dec, reversed(skips)):
                 x = up(x)
-                # Handle size mismatch due to odd dimensions
                 if x.shape[-1] != skip.shape[-1]:
-                    x = torch.nn.functional.interpolate(x, size=skip.shape[-1])
+                    x = F.interpolate(x, size=skip.shape[-1], mode="nearest")
                 x = torch.cat([skip, x], dim=1)
                 x = dec(x)
+
             return self.head(x)
 
     return UNet1D(depth=depth)
-
 
 def _build_cnn_torch():
     """Lightweight 1-D CNN (encoder-decoder style)."""

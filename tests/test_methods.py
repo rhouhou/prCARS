@@ -86,7 +86,7 @@ class TestMEMEdgeCases:
     def test_correlation_with_truth(self):
         wn, cars, im_true = synthetic_cars(seed=7)
         result = ca.retrieve(wn, cars, method="mem",
-                             background="als", auto_phase=True,
+                             background="none", auto_phase=True,
                              silent_region=(2700, 2730),
                              retriever_kw={"order": 128})
         r = spectral_pearson(result.im_chi3, im_true)

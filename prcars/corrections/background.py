@@ -80,7 +80,7 @@ def background_als(
     *,
     lam: float = 1e5,
     p: float = 0.01,
-    n_iter: int = 10,
+    n_iter: int = 50,
 ) -> np.ndarray:
     """
     Asymmetric Least Squares (ALS) baseline.
@@ -105,7 +105,7 @@ def background_als(
         W = diags(w, 0, dtype=float).tocsc()
         z = spsolve((W + H).tocsc(), w * intensity)
         w = np.where(intensity > z, p, 1 - p)
-    return z
+    return np.maximum(z, 1e-30)
 
 
 def background_rolling_ball(

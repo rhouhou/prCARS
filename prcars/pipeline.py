@@ -199,12 +199,18 @@ class Pipeline:
         bg = self.estimate_background(wn, I)
         inter["background"] = bg
 
-        # 4 – background correction
-        I_corr = self.apply_correction(I, bg)
-        inter["after_correction"] = I_corr.copy()
+        # 4 – background correction / retrieval input
+        if self.method == "kk":
+            # For KK, pass the raw intensity and the estimated NRB separately.
+            I_corr = I.copy()
+            inter["after_correction"] = I_corr.copy()
+            raw = self._retriever.retrieve(wn, I_corr, nr_background=bg)
+        else:
+            # For MEM / NN, keep the generic correction pipeline.
+            I_corr = self.apply_correction(I, bg)
+            inter["after_correction"] = I_corr.copy()
+            raw = self._retriever.retrieve(wn, I_corr)
 
-        # 5 – retrieval
-        raw = self._retriever.retrieve(wn, I_corr)
         inter.update({f"retriever_{k}": v for k, v in raw.items()
                       if k != "wavenumbers"})
 
