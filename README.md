@@ -444,6 +444,7 @@ Recommended pages:
 
 - [`docs/methods.md`](docs/methods.md)
 - [`docs/preprocessing.md`](docs/preprocessing.md)
+- [`docs/examples.md`](docs/examples.md)
 
 ---
 
