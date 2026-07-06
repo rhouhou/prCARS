@@ -70,12 +70,21 @@ include = ["prcars*"]
 
 # ── ruff (linting) ────────────────────────────────────────────────────────────
 [tool.ruff]
-line-length = 99
-target-version = "py310"
+line-length = 88
+target-version = "py39"
 
 [tool.ruff.lint]
-select = ["E", "F", "W", "I", "UP", "B", "C4", "PIE", "RUF"]
-ignore = ["E501"]
+select = [
+  "E",
+  "F",
+  "I",
+  "B",
+]
+ignore = [
+  "E741",  # allow scientific intensity variable names like I
+  "B028",  # do not require stacklevel on every warning yet
+  "B905",  # do not require zip(strict=...) for Python 3.9 compatibility
+]
 
 # ── pytest ────────────────────────────────────────────────────────────────────
 [tool.pytest.ini_options]

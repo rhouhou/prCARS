@@ -6,10 +6,10 @@ Background estimation strategies and correction modes.
 from __future__ import annotations
 
 import warnings
+
 import numpy as np
 from scipy.sparse import diags
 from scipy.sparse.linalg import spsolve
-
 
 # ── estimators ────────────────────────────────────────────────────────────────
 

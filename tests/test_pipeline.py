@@ -4,14 +4,16 @@ tests/test_pipeline.py
 Core tests for the cars-analysis package.
 Run with:  pytest -v
 """
+import os
+import sys
+
 import numpy as np
 import pytest
-import sys, os
+
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
 import prcars as ca
-from prcars.utils import synthetic_cars, spectral_pearson
-
+from prcars.utils import spectral_pearson, synthetic_cars
 
 # ── shared fixtures ────────────────────────────────────────────────────────────
 
@@ -135,8 +137,10 @@ class TestKramersKronig:
             silent_region=(2700, 2730),
             denoise="none",
         )
-        print("pipeline background rolling_ball:", spectral_pearson(res_rb.im_chi3, im_true))
-
+        print(
+            "pipeline background rolling_ball:",
+            spectral_pearson(res_rb.im_chi3, im_true),
+        )
         assert True
 
 class TestMaximumEntropy:

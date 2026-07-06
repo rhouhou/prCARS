@@ -1,9 +1,9 @@
-# Byte-compiled / optimized / DLL files
+# Python cache
 __pycache__/
 *.py[cod]
 *$py.class
 
-# Distribution / packaging
+# Build / packaging
 build/
 dist/
 *.egg-info/
@@ -16,13 +16,15 @@ venv/
 env/
 ENV/
 
-# Test / coverage
+# Testing / coverage
 .pytest_cache/
 .coverage
 .coverage.*
 htmlcov/
 .tox/
 .nox/
+
+# Type checking / linting
 .mypy_cache/
 .ruff_cache/
 
@@ -39,11 +41,20 @@ htmlcov/
 .DS_Store
 Thumbs.db
 
-# Logs
+# Logs and environment files
 *.log
 .env
 
-# Local data outputs
+# Local generated outputs
 outputs/
+results/
+tmp/
+tmp_*/
 *.npz
 *.npy
+
+# Keep lightweight documentation assets if added later
+!docs/assets/
+!docs/assets/*.png
+!docs/assets/*.svg
+!docs/assets/*.pdf

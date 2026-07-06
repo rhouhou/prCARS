@@ -31,13 +31,11 @@ instantiation with a helpful message.
 """
 from __future__ import annotations
 
-import os
-import warnings
 import importlib
+import warnings
 from pathlib import Path
-from typing import Optional, Union
-import numpy as np
 
+import numpy as np
 
 # ── model registry ────────────────────────────────────────────────────────────
 
@@ -171,7 +169,6 @@ def _build_cnn_torch():
 
 def _build_unet_keras(input_len: int = 512, depth: int = 4):
     """1-D U-Net implemented in Keras."""
-    import tensorflow as tf
     from tensorflow import keras
     from tensorflow.keras import layers
 
@@ -435,7 +432,7 @@ class NeuralNetRetriever:
         lr: float = 1e-4,
         validation_split: float = 0.1,
         verbose: bool = True,
-    ) -> "NeuralNetRetriever":
+    ) -> NeuralNetRetriever:
         """
         Fine-tune the loaded model on new labelled CARS data.
 
@@ -463,7 +460,7 @@ class NeuralNetRetriever:
 
     def _fine_tune_torch(self, X, y, epochs, batch_size, lr, val_split, verbose):
         import torch
-        from torch.utils.data import TensorDataset, DataLoader, random_split
+        from torch.utils.data import DataLoader, TensorDataset, random_split
 
         X_t = torch.tensor(X[:, np.newaxis, :], dtype=torch.float32)
         y_t = torch.tensor(y[:, np.newaxis, :], dtype=torch.float32)

@@ -1,290 +1,472 @@
-# prcars
+# prCARS
 
-> **CARS spectral retrieval in Python** — Kramers-Kronig · Maximum Entropy · Neural Networks
+![Python](https://img.shields.io/badge/Python-3.9%2B-blue)
+![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)
+![Status](https://img.shields.io/badge/status-alpha-orange)
+![Project Type](https://img.shields.io/badge/project-scientific%20Python-purple)
 
-[![PyPI](https://img.shields.io/pypi/v/prcars)](https://pypi.org/project/prcars/)
-[![Python](https://img.shields.io/pypi/pyversions/prcars)](https://pypi.org/project/prcars/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
-[![Tests](https://github.com/rhouhou/prcars/actions/workflows/ci.yml/badge.svg)](https://github.com/rhouhou/prcars/actions)
+**prCARS** is a Python toolkit for phase retrieval, non-resonant-background correction, preprocessing, and Raman-like signal reconstruction from Coherent Anti-Stokes Raman Scattering (CARS/BCARS) spectra.
 
-`prcars` extracts the imaginary part of the third-order susceptibility
-Im[χ⁽³⁾] from raw Coherent Anti-Stokes Raman Scattering (CARS) spectra.
-The package provides a **unified pipeline** where you choose:
+The package provides a modular pipeline for recovering Raman-like information from CARS spectra using classical retrieval methods such as Kramers-Kronig and Maximum Entropy Method, with optional neural-network retrieval support.
 
-| Step | Options |
-|------|---------|
-| Phase-matching correction | sinc² envelope |
-| Denoising | Savitzky-Golay · Wiener · Wavelet |
-| Background estimation | ALS · Polynomial · SNIP · Rolling-ball |
-| Background correction | Subtract · Divide · √-Divide |
-| **Retrieval** | **KK · MEM · Neural Network (pretrained or fine-tuned)** |
-| Phase correction | Automatic (silent-region optimisation) |
+---
+
+## Why this project matters
+
+CARS and BCARS spectra contain chemically meaningful Raman-like information, but the measured signal is affected by the non-resonant background, interference effects, instrument response, noise, and baseline artifacts.
+
+prCARS provides a research-oriented Python workflow for:
+
+* preprocessing CARS/BCARS spectra
+* estimating and correcting background contributions
+* retrieving Raman-like spectral content
+* comparing retrieval methods
+* testing phase-retrieval pipelines on synthetic examples
+
+The goal is to make CARS/BCARS spectral retrieval easier to test, compare, and integrate into scientific machine-learning workflows.
+
+---
+
+## What this repository demonstrates
+
+This project demonstrates:
+
+* scientific signal-processing package design
+* modular spectroscopy preprocessing
+* phase-retrieval workflow construction
+* non-resonant-background correction
+* synthetic CARS/BCARS test data generation
+* benchmark utilities for retrieval evaluation
+* foundations for integration with CARSBench and CARSGuard
+
+---
+
+## Key features
+
+* Kramers-Kronig phase retrieval
+* Maximum Entropy Method retrieval
+* Optional neural-network retrieval interface
+* Background estimation methods:
+
+  * ALS
+  * polynomial fitting
+  * SNIP
+  * rolling-ball
+* Background correction methods:
+
+  * subtract
+  * divide
+  * square-root divide
+* Denoising methods:
+
+  * Savitzky-Golay
+  * Wiener
+  * wavelet-based denoising
+* Optional phase-matching correction
+* Automatic phase correction with silent-region optimization
+* Synthetic CARS example generation
+* Benchmark utilities for comparing retrieval results
+* Reusable pipeline object for reproducible workflows
+
+---
+
+## Project status
+
+prCARS is currently an **alpha-stage research and portfolio project**.
+
+| Component                          | Status                  |
+| ---------------------------------- | ----------------------- |
+| Kramers-Kronig retrieval           | Implemented             |
+| MEM retrieval                      | Implemented             |
+| Background estimation              | Implemented             |
+| Background correction              | Implemented             |
+| Denoising utilities                | Implemented             |
+| Synthetic CARS utility             | Implemented             |
+| Benchmark helper utilities         | Implemented             |
+| Neural-network retrieval interface | Experimental / optional |
+| Real-data validation workflow      | Planned                 |
+| Integration with CARSBench         | Planned                 |
+| Integration with CARSGuard         | Planned                 |
+| Full documentation site            | Planned                 |
 
 ---
 
 ## Installation
 
+Clone the repository:
+
 ```bash
-# core (KK + MEM)
-pip install prcars
+git clone https://github.com/rhouhou/prCARS.git
+cd prCARS
+```
 
-# with wavelet denoising
-pip install "prcars[wavelet]"
+Create and activate a virtual environment:
 
-# with plotting helpers
-pip install "prcars[plot]"
+```bash
+python -m venv .venv
+source .venv/bin/activate
+```
 
-# with PyTorch neural-network support
-pip install "prcars[torch]"
+On some macOS/Linux systems, you may need to use `python3` instead of `python`.
 
-# everything
-pip install "prcars[wavelet,plot]"
+Install the package in editable mode:
+
+```bash
+python -m pip install --upgrade pip setuptools wheel
+python -m pip install -e .
+```
+
+For development tools:
+
+```bash
+python -m pip install -e ".[dev]"
+```
+
+For plotting helpers:
+
+```bash
+python -m pip install -e ".[plot]"
+```
+
+For wavelet denoising support:
+
+```bash
+python -m pip install -e ".[wavelet]"
+```
+
+For optional PyTorch neural-network support:
+
+```bash
+python -m pip install -e ".[torch]"
+```
+
+For most local development:
+
+```bash
+python -m pip install -e ".[dev,plot,wavelet]"
 ```
 
 ---
 
-## Quick start
+## Installation check
+
+After installation, verify that the package can be imported:
+
+```bash
+python -c "import prcars; print(prcars.__name__)"
+```
+
+Expected output:
+
+```text
+prcars
+```
+
+Run the test suite:
+
+```bash
+python -m pytest
+```
+
+---
+
+## Quickstart
 
 ```python
 import numpy as np
 import prcars as ca
 
-# load your data
-wavenumbers = np.load("wavenumbers.npy")   # cm⁻¹
-cars_raw    = np.load("cars_spectrum.npy")
+# Example input arrays
+wavenumbers = np.load("wavenumbers.npy")
+cars_raw = np.load("cars_spectrum.npy")
 
-# one-liner with defaults  (KK + ALS background + Savitzky-Golay)
-result = ca.retrieve(wavenumbers, cars_raw)
+# Default retrieval pipeline
+result = ca.retrieve(
+    wavenumbers,
+    cars_raw,
+)
 
-print(result.im_chi3)          # Im[χ³] – your Raman-like spectrum
-print(result.peak_positions())  # wavenumbers of detected peaks
-result.plot()                   # diagnostic 3-panel figure
-result.save("result.npz")       # save to disk
+im_chi3 = result.im_chi3
+print(im_chi3)
+```
+
+The recovered `im_chi3` signal represents a Raman-like target extracted from the CARS/BCARS spectrum.
+
+---
+
+## Synthetic example
+
+prCARS includes utilities for generating synthetic CARS-like test data.
+
+```python
+from prcars.utils import synthetic_cars
+
+wavenumbers, cars_raw, im_true = synthetic_cars(seed=0)
+
+result = ca.retrieve(
+    wavenumbers,
+    cars_raw,
+    method="kk",
+)
+
+print(result.im_chi3.shape)
+```
+
+Synthetic examples are useful for checking whether the retrieval pipeline works before applying it to experimental data.
+
+---
+
+## Retrieval methods
+
+### Kramers-Kronig retrieval
+
+```python
+result = ca.retrieve(
+    wavenumbers,
+    cars_raw,
+    method="kk",
+)
+```
+
+Advanced example:
+
+```python
+result = ca.retrieve(
+    wavenumbers,
+    cars_raw,
+    method="kk",
+    background="als",
+    correction="divide",
+    denoise="savgol",
+    auto_phase=True,
+    silent_region=(2700, 2730),
+    retriever_kw={"zero_pad_factor": 8},
+)
 ```
 
 ---
 
-## Choosing the retrieval method
-
-### Kramers-Kronig (default)
-
-```python
-result = ca.retrieve(wavenumbers, cars_raw, method="kk")
-
-# advanced KK options
-result = ca.retrieve(
-    wavenumbers, cars_raw,
-    method       = "kk",
-    background   = "als",          # 'als' | 'polynomial' | 'snip' | 'rolling_ball'
-    correction   = "divide",       # 'divide' | 'subtract' | 'sqrt_divide'
-    denoise      = "savgol",       # 'savgol' | 'wiener' | 'wavelet' | 'none'
-    auto_phase   = True,
-    silent_region= (2700, 2730),   # cm⁻¹ window with no Raman peaks
-    retriever_kw = {"zero_pad_factor": 8},
-)
-```
-
-### Maximum Entropy Method
+### Maximum Entropy Method retrieval
 
 ```python
 result = ca.retrieve(
-    wavenumbers, cars_raw,
-    method       = "mem",
-    background   = "snip",
-    retriever_kw = {
-        "order"        : 128,          # AR model order (None → auto)
-        "solver"       : "burg",       # 'burg' | 'yulewalker'
-        "phase_method" : "kk",         # 'kk' | 'mem_phase'
+    wavenumbers,
+    cars_raw,
+    method="mem",
+    background="snip",
+    correction="divide",
+    retriever_kw={
+        "order": 128,
+        "solver": "burg",
+        "phase_method": "kk",
     },
 )
 ```
 
-### Neural Network (pretrained)
+---
+
+### Optional neural-network retrieval
+
+Neural-network retrieval is optional and requires an additional backend such as PyTorch or TensorFlow.
 
 ```python
-# download bundled weights once
-import prcars.networks as nets
-nets.download_weights()
-
 result = ca.retrieve(
-    wavenumbers, cars_raw,
-    method       = "nn",
-    background   = "als",
-    retriever_kw = {
-        "model_name" : "cars_unet_v1",   # or 'cars_cnn_v1'
-        "backend"    : "torch",           # 'torch' | 'tensorflow' | None (auto)
+    wavenumbers,
+    cars_raw,
+    method="nn",
+    background="als",
+    retriever_kw={
+        "model_name": "cars_unet_v1",
+        "backend": "torch",
     },
 )
 ```
 
-### Neural Network – fine-tune on your own data
-
-```python
-from prcars import NeuralNetRetriever
-
-nn = NeuralNetRetriever(model_name="cars_unet_v1")
-
-# X_train: (N, L) array of CARS spectra
-# y_train: (N, L) array of ground-truth Im[χ³]
-nn.fine_tune(X_train, y_train, epochs=50, lr=5e-5)
-nn.save("my_model.pt")
-
-# use the fine-tuned model
-result = ca.retrieve(wavenumbers, cars_raw,
-                     method="nn",
-                     retriever_kw={"model_path": "my_model.pt"})
-```
+This interface is experimental and intended for future learned retrieval workflows.
 
 ---
 
 ## Pipeline object
 
-For reproducible, reusable workflows use `Pipeline` directly:
+For reproducible workflows, use the `Pipeline` object directly.
 
 ```python
+import prcars as ca
+
 pipeline = ca.Pipeline(
-    method        = "mem",
-    background    = "als",
-    correction    = "divide",
-    denoise       = "wavelet",
-    denoise_kw    = {"wavelet": "sym5", "level": 4},
-    background_kw = {"lam": 1e6, "p": 0.005},
-    auto_phase    = True,
-    silent_region = (2700, 2730),
+    method="kk",
+    background="als",
+    correction="divide",
+    denoise="savgol",
+    auto_phase=True,
+    silent_region=(2700, 2730),
 )
 
-result = pipeline.run(wavenumbers, spectrum_1)
-result2 = pipeline.run(wavenumbers, spectrum_2)   # same settings
+result_1 = pipeline.run(wavenumbers, spectrum_1)
+result_2 = pipeline.run(wavenumbers, spectrum_2)
 ```
 
+This is useful when applying the same retrieval configuration to multiple spectra.
+
 ---
 
-## Access intermediate results
+## Background and preprocessing options
+
+| Step                  | Options                                             |
+| --------------------- | --------------------------------------------------- |
+| Background estimation | `als`, `polynomial`, `snip`, `rolling_ball`, `none` |
+| Background correction | `subtract`, `divide`, `sqrt_divide`, `none`         |
+| Denoising             | `savgol`, `wiener`, `wavelet`, `none`               |
+| Retrieval             | `kk`, `mem`, `nn`                                   |
+| Phase correction      | automatic silent-region optimization                |
+
+---
+
+## Benchmarking
+
+prCARS includes utilities for comparing retrieval methods against a known synthetic target.
 
 ```python
-result = pipeline.run(wavenumbers, cars_raw)
+from prcars.utils import synthetic_cars, benchmark
 
-# intermediate arrays stored in result.intermediate
-bg_corrected = result.intermediate["after_correction"]
-denoised     = result.intermediate["after_denoise"]
-```
+wavenumbers, cars_raw, im_true = synthetic_cars(seed=0)
 
----
-
-## Benchmarking against ground truth
-
-```python
-from prcars.utils import synthetic_cars, benchmark, compare_plot
-
-wn, cars, im_true = synthetic_cars()
-
-scores = benchmark(wn, cars, im_true, methods=["kk", "mem"])
-for method, data in scores.items():
-    print(f"{method}: MSE={data['mse']:.5f}  r={data['pearson']:.4f}")
-
-compare_plot(wn, im_true, scores)
-```
-
----
-
-## Background methods at a glance
-
-| Method | Best for | Key parameters |
-|--------|----------|---------------|
-| `als` | Smoothly varying background | `lam` (smoothness), `p` (asymmetry) |
-| `polynomial` | Known signal-free regions | `degree`, `mask` |
-| `snip` | Noisy spectra, no manual tuning | `max_iterations` |
-| `rolling_ball` | Broad undulating background | `radius` |
-
----
-
-## Phase-matching correction
-
-For loosely focused or non-collinear geometries pass the wave-vector mismatch:
-
-```python
-result = ca.retrieve(
-    wavenumbers, cars_raw,
-    phase_matching = {"delta_k": 0.02, "interaction_length": 0.3},
+scores = benchmark(
+    wavenumbers,
+    cars_raw,
+    im_true,
+    methods=["kk", "mem"],
 )
+
+for method, values in scores.items():
+    print(method, values)
 ```
 
-Set `phase_matching=None` (default) to skip (appropriate for tight focusing).
+These benchmark utilities are intended for quick sanity checks and method comparisons.
 
 ---
 
-## Adding your own pretrained model
+## Example workflow
 
-Drop a `.pt` (PyTorch) or `.h5` (Keras) file into `~/.prcars/models/`
-and pass its stem as `model_name`:
+A typical retrieval workflow is:
 
-```python
-# file: ~/.prcars/models/my_awesome_model.pt
-result = ca.retrieve(wn, cars,
-                     method="nn",
-                     retriever_kw={"model_name": "my_awesome_model"})
-```
-
----
-
-## Project structure
-
-```
-prcars/
-├── __init__.py          # public API
-├── pipeline.py          # Pipeline orchestrator + retrieve()
-├── result.py            # CARSResult dataclass
-├── methods/
-│   ├── kk.py            # Kramers-Kronig
-│   ├── mem.py           # Maximum Entropy Method
-│   └── nn.py            # Neural Network retriever
-├── corrections/
-│   ├── background.py    # estimators + correction
-│   ├── denoise.py       # Savitzky-Golay, Wiener, Wavelet
-│   ├── phase.py         # auto_phase_correction
-│   └── phase_matching.py
-├── networks/
-│   └── __init__.py      # weight registry + download_weights()
-└── utils/
-    └── __init__.py      # synthetic data, benchmark, compare_plot
-tests/
-examples/
-docs/
+```text
+Load CARS/BCARS spectrum
+Preprocess / denoise signal
+Estimate background
+Apply background correction
+Run phase retrieval
+Apply optional phase correction
+Inspect Raman-like output
+Compare against reference or synthetic target
 ```
 
 ---
 
-## Contributing
+## Repository structure
 
-1. Fork the repo and create a feature branch.
-2. Install dev dependencies: `pip install -e ".[dev]"`
-3. Run tests: `pytest`
-4. Lint: `ruff check .`
-5. Open a pull request.
+```text
+prCARS/
+  examples/
+    Example scripts and usage demos
+
+  prcars/
+    __init__.py
+    pipeline.py
+    result.py
+
+    methods/
+      kk.py
+      mem.py
+      nn.py
+
+    corrections/
+      background.py
+      denoise.py
+      phase.py
+      phase_matching.py
+
+    networks/
+      Optional neural-network model utilities
+
+    utils/
+      Synthetic data, benchmarking, and plotting helpers
+
+  tests/
+    Unit and pipeline tests
+
+  sanity_check.py
+    Small local check script
+
+  pyproject.toml
+    Package metadata and dependencies
+```
+
+---
+
+## Relationship to the CARS ecosystem
+
+prCARS is designed to work as the retrieval layer in a broader CARS/BCARS workflow:
+
+```text
+CARSBench  → generate synthetic benchmark spectra
+prCARS     → recover Raman-like spectra
+CARSGuard  → validate plausibility and Raman consistency
+```
+
+Together, these projects form a small research ecosystem for simulation, retrieval, and validation of CARS/BCARS spectra.
+
+---
+
+## Limitations
+
+prCARS is a research and educational software project.
+
+Current limitations include:
+
+* The package is not a substitute for experimental validation.
+* Retrieval quality depends on preprocessing choices and input signal quality.
+* Neural-network retrieval is experimental and optional.
+* Real-data validation workflows are still planned.
+* Results should be interpreted carefully when applied to real biological or clinical spectra.
+
+This project is **not intended for clinical diagnosis, medical decision-making, or deployment in real healthcare settings**.
+
+---
+
+## Roadmap
+
+Planned improvements include:
+
+* Improve test coverage for retrieval methods and correction utilities
+* Add GitHub Actions CI for tests and linting
+* Add documentation pages for retrieval methods and preprocessing choices
+* Add example figures to the README
+* Add stronger synthetic benchmark reports
+* Add integration examples with CARSBench
+* Add validation examples with CARSGuard
+* Add real CARS/BCARS data examples where licensing allows
+* Improve neural-network retrieval documentation
+* Add release notes and citation metadata
 
 ---
 
 ## Citation
 
-If you use this package in published work, please cite:
+If you use prCARS in research, education, or benchmarking work, please cite:
 
 ```bibtex
-@software{prcars,
-  author  = {Dr. Rola Houhou},
-  title   = {prcars: CARS spectral retrieval in Python},
-  year    = {2026},
-  url     = {https://github.com/rhouhou/prcars},
+@misc{prcars2026,
+  title={prCARS: Phase Retrieval and Raman-like Signal Reconstruction for CARS/BCARS Spectroscopy},
+  author={Houhou, Rola},
+  year={2026},
+  note={Alpha research software},
+  url={https://github.com/rhouhou/prCARS}
 }
 ```
-
-Key references implemented here:
-- E.M. Vartiainen et al., *J. Appl. Phys.* **75**, 2815 (1994) — MEM
-- Y. Liu et al., *Opt. Lett.* **34**, 1363 (2009) — MEM-CARS
-- C.H. Camp Jr. & M.T. Cicerone, *Nat. Photon.* **9**, 295 (2015) — KK review
-- P.H.C. Eilers & H.F.M. Boelens (2005) — ALS baseline
 
 ---
 
 ## License
 
-MIT © Dr. Rola Houhou
+This project is licensed under the MIT License.

@@ -6,7 +6,7 @@ Unified result container returned by every retrieval method.
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import Optional
+
 import numpy as np
 
 
@@ -47,7 +47,7 @@ class CARSResult:
     chi3_complex: np.ndarray
     amplitude:    np.ndarray
     phase:        np.ndarray
-    background:   Optional[np.ndarray] = None
+    background:   np.ndarray | None = None
     phase_offset: float                = 0.0
     method:       str                  = "unknown"
     intermediate: dict                 = field(default_factory=dict)
@@ -62,7 +62,7 @@ class CARSResult:
         idx, _ = find_peaks(norm, prominence=prominence)
         return self.wavenumbers[idx]
 
-    def normalise(self, method: str = "max") -> "CARSResult":
+    def normalise(self, method: str = "max") -> CARSResult:
         """Return a copy with Im[χ³] normalised to [0, 1]."""
         import copy
         out = copy.copy(self)
@@ -91,7 +91,7 @@ class CARSResult:
         )
 
     @classmethod
-    def load(cls, path: str) -> "CARSResult":
+    def load(cls, path: str) -> CARSResult:
         """Load a previously saved .npz result."""
         d = np.load(path)
         bg = d["background"] if d["background"].size else None
