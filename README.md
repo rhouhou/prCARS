@@ -42,6 +42,12 @@ This project demonstrates:
 
 ---
 
+## Example output
+
+![prCARS synthetic retrieval example](docs/assets/example_retrieval.png)
+
+---
+
 ## Key features
 
 * Kramers-Kronig phase retrieval
