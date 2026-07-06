@@ -4,6 +4,7 @@
 ![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)
 ![Status](https://img.shields.io/badge/status-alpha-orange)
 ![Project Type](https://img.shields.io/badge/project-scientific%20Python-purple)
+![CI](https://github.com/rhouhou/prCARS/actions/workflows/ci.yml/badge.svg)
 
 **prCARS** is a Python toolkit for phase retrieval, non-resonant-background correction, preprocessing, and Raman-like signal reconstruction from Coherent Anti-Stokes Raman Scattering (CARS/BCARS) spectra.
 
@@ -84,10 +85,11 @@ prCARS is currently an **alpha-stage research and portfolio project**.
 | Synthetic CARS utility             | Implemented             |
 | Benchmark helper utilities         | Implemented             |
 | Neural-network retrieval interface | Experimental / optional |
-| Real-data validation workflow      | Planned                 |
-| Integration with CARSBench         | Planned                 |
-| Integration with CARSGuard         | Planned                 |
-| Full documentation site            | Planned                 |
+| GitHub Actions CI | Implemented |
+| Real-data validation workflow | Planned |
+| Integration with CARSBench | Planned |
+| Integration with CARSGuard | Planned |
+| Full documentation site | Planned |
 
 ---
 
@@ -439,7 +441,7 @@ This project is **not intended for clinical diagnosis, medical decision-making, 
 Planned improvements include:
 
 * Improve test coverage for retrieval methods and correction utilities
-* Add GitHub Actions CI for tests and linting
+* Expand CI with optional backend tests for PyTorch or TensorFlow
 * Add documentation pages for retrieval methods and preprocessing choices
 * Add example figures to the README
 * Add stronger synthetic benchmark reports
