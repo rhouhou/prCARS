@@ -8,9 +8,10 @@ prCARS is an alpha-stage Python toolkit for phase retrieval, background correcti
 
 ## Documentation pages
 
-| Page                       | Description                                        |
-| -------------------------- | -------------------------------------------------- |
+| Page | Description |
+|---|---|
 | [`methods.md`](methods.md) | Explains the retrieval methods available in prCARS |
+| [`preprocessing.md`](preprocessing.md) | Explains background estimation, correction, denoising, and phase-correction choices |
 
 ---
 

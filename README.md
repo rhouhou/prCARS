@@ -443,6 +443,7 @@ Additional documentation is available in the [`docs/`](docs/) folder.
 Recommended pages:
 
 - [`docs/methods.md`](docs/methods.md)
+- [`docs/preprocessing.md`](docs/preprocessing.md)
 
 ---
 
