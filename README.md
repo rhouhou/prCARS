@@ -436,6 +436,16 @@ This project is **not intended for clinical diagnosis, medical decision-making, 
 
 ---
 
+## Documentation
+
+Additional documentation is available in the [`docs/`](docs/) folder.
+
+Recommended pages:
+
+- [`docs/methods.md`](docs/methods.md)
+
+---
+
 ## Roadmap
 
 Planned improvements include:
