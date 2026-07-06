@@ -1,26 +1,50 @@
 # Changelog
 
-All notable changes to this project will be documented here.
-Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
+All notable changes to prCARS will be documented in this file.
+
+This project follows a simple versioned changelog format.
 
 ---
 
-## [Unreleased]
-
-## [0.1.0] – 2025-XX-XX
+## [0.1.0-alpha] - 2026-07-06
 
 ### Added
-- `KramersKronig` retriever: FFT-based and direct principal-value Hilbert transform.
-- `MaximumEntropy` retriever: Burg lattice and Yule-Walker AR solvers with KK or native phase retrieval.
-- `NeuralNetRetriever`: unified PyTorch / TensorFlow backend, pretrained model registry, fine-tuning API.
-- `Pipeline` orchestrator with pluggable background, correction, denoise, and retrieval steps.
-- `retrieve()` top-level convenience function.
-- Background estimators: ALS, polynomial, SNIP, rolling-ball.
-- Denoising: Savitzky-Golay, Wiener, wavelet (PyWavelets).
-- Phase-matching sinc² correction.
-- Automatic constant-phase correction via silent-region optimisation.
-- `CARSResult` dataclass with `save()`, `load()`, `plot()`, `peak_positions()`, `normalise()`.
-- `utils` module: synthetic CARS generator, benchmark, compare_plot.
-- `networks` module: weight registry and `download_weights()`.
-- Full test suite (pytest) with parametrised coverage of all methods and corrections.
-- GitHub Actions CI matrix (Ubuntu, macOS, Windows × Python 3.10–3.12).
+
+- Initial alpha version of prCARS
+- Kramers-Kronig phase retrieval workflow
+- Maximum Entropy Method retrieval workflow
+- Optional neural-network retrieval interface
+- Background estimation utilities:
+  - ALS
+  - polynomial fitting
+  - SNIP
+  - rolling-ball
+- Background correction modes:
+  - subtract
+  - divide
+  - square-root divide
+- Denoising utilities:
+  - Savitzky-Golay
+  - Wiener
+  - wavelet-based denoising
+- Synthetic CARS/BCARS example generation
+- Benchmark utilities for comparing retrieval outputs
+- Pipeline object for reproducible retrieval workflows
+- Basic tests for retrieval, preprocessing, and pipeline behavior
+- GitHub Actions CI for linting and tests
+- Citation metadata with `CITATION.cff`
+- Improved README with installation, quickstart, methods, limitations, and roadmap
+
+### Fixed
+
+- Fixed Kramers-Kronig direct phase retrieval method call
+- Updated optional neural-network tests to skip when PyTorch or TensorFlow is not installed
+- Tuned Ruff configuration for the current alpha-stage scientific codebase
+- Cleaned repository hygiene and ignored local system/generated files
+
+### Notes
+
+- Neural-network retrieval is experimental and requires optional backend dependencies.
+- Generated data and large outputs are not included in the repository.
+- This project is for research, education, and portfolio demonstration.
+- It is not intended for clinical diagnosis, medical decision-making, or deployment in real healthcare settings.
