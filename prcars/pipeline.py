@@ -5,12 +5,9 @@ Orchestrates the full pre-processing → retrieval → post-processing chain.
 """
 from __future__ import annotations
 
-import warnings
-from typing import Optional, Union
 import numpy as np
 
 from prcars.result import CARSResult
-
 
 # ── registry helpers ──────────────────────────────────────────────────────────
 
@@ -77,12 +74,12 @@ class Pipeline:
         background: str = "rolling_ball",
         correction: str = "divide",
         denoise: str = "savgol",
-        phase_matching: Optional[dict] = None,
+        phase_matching: dict | None = None,
         auto_phase: bool = True,
-        silent_region: Optional[tuple] = None,
-        background_kw: Optional[dict] = None,
-        denoise_kw: Optional[dict] = None,
-        retriever_kw: Optional[dict] = None,
+        silent_region: tuple | None = None,
+        background_kw: dict | None = None,
+        denoise_kw: dict | None = None,
+        retriever_kw: dict | None = None,
     ):
         self.method = method.lower()
         self.background = (background or "none").lower()
@@ -101,13 +98,25 @@ class Pipeline:
     # ── validation ────────────────────────────────────────────────────────────
     def _validate(self):
         if self.method not in _RETRIEVAL_METHODS:
-            raise ValueError(f"method must be one of {_RETRIEVAL_METHODS}, got '{self.method}'")
+            raise ValueError(
+                f"method must be one of {_RETRIEVAL_METHODS}, "
+                f"got '{self.method}'"
+            )
         if self.background not in _BG_METHODS:
-            raise ValueError(f"background must be one of {_BG_METHODS}, got '{self.background}'")
+            raise ValueError(
+                f"background must be one of {_BG_METHODS}, "
+                f"got '{self.background}'"
+            )
         if self.correction not in _CORRECTION_MODES:
-            raise ValueError(f"correction must be one of {_CORRECTION_MODES}, got '{self.correction}'")
+            raise ValueError(
+                f"correction must be one of {_CORRECTION_MODES}, "
+                f"got '{self.correction}'"
+            )
         if self.denoise not in _DENOISE_METHODS:
-            raise ValueError(f"denoise must be one of {_DENOISE_METHODS}, got '{self.denoise}'")
+            raise ValueError(
+                f"denoise must be one of {_DENOISE_METHODS}, "
+                f"got '{self.denoise}'"
+            )
 
     # ── retriever factory ─────────────────────────────────────────────────────
     def _build_retriever(self):
@@ -139,7 +148,7 @@ class Pipeline:
         }[self.denoise]
         return fn(I, **self.denoise_kw)
 
-    def estimate_background(self, wn: np.ndarray, I: np.ndarray) -> Optional[np.ndarray]:
+    def estimate_background(self, wn: np.ndarray, I: np.ndarray) -> np.ndarray | None:
         if self.background == "none":
             return None
         from prcars.corrections import background as _bg
@@ -155,7 +164,7 @@ class Pipeline:
         return fn(wn, I, **self.background_kw)
 
     def apply_correction(
-        self, I: np.ndarray, bg: Optional[np.ndarray]
+        self, I: np.ndarray, bg: np.ndarray | None
     ) -> np.ndarray:
         if bg is None or self.correction == "none":
             return I
@@ -259,12 +268,12 @@ def retrieve(
     background: str = "rolling_ball",
     correction: str = "divide",
     denoise: str = "savgol",
-    phase_matching: Optional[dict] = None,
+    phase_matching: dict | None = None,
     auto_phase: bool = True,
-    silent_region: Optional[tuple] = None,
-    background_kw: Optional[dict] = None,
-    denoise_kw: Optional[dict] = None,
-    retriever_kw: Optional[dict] = None,
+    silent_region: tuple | None = None,
+    background_kw: dict | None = None,
+    denoise_kw: dict | None = None,
+    retriever_kw: dict | None = None,
 ) -> CARSResult:
     """
     One-call interface to the full CARS pipeline.

@@ -4,8 +4,8 @@ prcars.utils
 Helper utilities: synthetic data generation, benchmarking, and plotting.
 """
 from __future__ import annotations
-import numpy as np
 
+import numpy as np
 
 # ── synthetic CARS generator ──────────────────────────────────────────────────
 

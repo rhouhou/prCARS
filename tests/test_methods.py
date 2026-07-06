@@ -3,13 +3,23 @@ tests/test_methods.py
 ---------------------
 Extended tests for individual retrieval methods.
 """
+import os
+import sys
+
 import numpy as np
 import pytest
-import sys, os
+
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
+import importlib.util
+
 import prcars as ca
-from prcars.utils import synthetic_cars, spectral_pearson, spectral_mse
+from prcars.utils import spectral_mse, spectral_pearson, synthetic_cars
+
+HAS_NN_BACKEND = (
+    importlib.util.find_spec("torch") is not None
+    or importlib.util.find_spec("tensorflow") is not None
+)
 
 
 # ── KK edge cases ─────────────────────────────────────────────────────────────
@@ -95,6 +105,10 @@ class TestMEMEdgeCases:
 
 # ── NN stubs (no weights needed) ─────────────────────────────────────────────
 
+@pytest.mark.skipif(
+    not HAS_NN_BACKEND,
+    reason="Neural-network tests require PyTorch or TensorFlow.",
+)
 class TestNNRetriever:
     def test_no_weights_runs(self):
         """Random-weight network should still produce finite output."""
@@ -132,7 +146,7 @@ class TestNNRetriever:
     def test_missing_model_warns(self):
         """Nonexistent bundled model name should warn, not raise."""
         with pytest.warns(UserWarning):
-            nn = ca.NeuralNetRetriever(model_name="cars_unet_v1",
+            _ = ca.NeuralNetRetriever(model_name="cars_unet_v1",
                                        architecture="cnn", input_len=512)
 
     def test_save_load(self, tmp_path):

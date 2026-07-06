@@ -26,9 +26,9 @@ and then
 from __future__ import annotations
 
 import warnings
+
 import numpy as np
-from scipy import signal, interpolate
-from scipy.optimize import minimize
+from scipy import interpolate, signal
 
 
 class KramersKronig:
@@ -148,6 +148,7 @@ class KramersKronig:
         analytic = signal.hilbert(padded)
         return -np.imag(analytic)[:n]
 
+    @staticmethod
     def _phase_direct(wn: np.ndarray, log_amplitude: np.ndarray) -> np.ndarray:
         """Direct principal-value KK integral (O(N²), for validation)."""
         n   = len(wn)

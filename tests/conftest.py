@@ -3,9 +3,12 @@ tests/conftest.py
 -----------------
 Shared pytest fixtures for prcars test suite.
 """
+import os
+import sys
+
 import numpy as np
 import pytest
-import sys, os
+
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
 

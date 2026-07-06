@@ -31,8 +31,9 @@ prioritizes stable Raman-like recovery over aggressive spectral reconstruction.
 from __future__ import annotations
 
 import warnings
+
 import numpy as np
-from scipy import linalg, signal, interpolate
+from scipy import interpolate, linalg, signal
 
 
 class MaximumEntropy:

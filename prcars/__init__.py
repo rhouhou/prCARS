@@ -23,7 +23,7 @@ Usage
 >>> result   = pipeline.run(wavenumbers, cars_intensity)
 """
 
-from importlib.metadata import version, PackageNotFoundError
+from importlib.metadata import PackageNotFoundError, version
 
 try:
     __version__ = version("prcars")
@@ -31,26 +31,24 @@ except PackageNotFoundError:
     __version__ = "0.1.0-dev"
 
 # ── public API ────────────────────────────────────────────────────────────────
-from prcars.pipeline import Pipeline, retrieve
-from prcars.result import CARSResult
-
-from prcars.methods.kk  import KramersKronig
-from prcars.methods.mem import MaximumEntropy
-from prcars.methods.nn  import NeuralNetRetriever
-
 from prcars.corrections.background import (
     background_als,
     background_polynomial,
-    background_snip,
     background_rolling_ball,
+    background_snip,
 )
-from prcars.corrections.phase_matching import phase_matching_correction
 from prcars.corrections.denoise import (
     denoise_savgol,
-    denoise_wiener,
     denoise_wavelet,
+    denoise_wiener,
 )
 from prcars.corrections.phase import auto_phase_correction
+from prcars.corrections.phase_matching import phase_matching_correction
+from prcars.methods.kk import KramersKronig
+from prcars.methods.mem import MaximumEntropy
+from prcars.methods.nn import NeuralNetRetriever
+from prcars.pipeline import Pipeline, retrieve
+from prcars.result import CARSResult
 
 __all__ = [
     # pipeline
