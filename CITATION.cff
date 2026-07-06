@@ -1,0 +1,25 @@
+cff-version: 1.2.0
+message: "If you use prCARS in research, education, or benchmarking work, please cite it using the metadata from this file."
+title: "prCARS: Phase Retrieval and Raman-like Signal Reconstruction for CARS/BCARS Spectroscopy"
+authors:
+
+* family-names: "Houhou"
+  given-names: "Rola"
+  year: 2026
+  version: "0.1.0-alpha"
+  date-released: 2026-07-06
+  license: "MIT"
+  repository-code: "https://github.com/rhouhou/prCARS"
+  url: "https://github.com/rhouhou/prCARS"
+  abstract: "prCARS is an alpha-stage Python toolkit for phase retrieval, non-resonant-background correction, preprocessing, and Raman-like signal reconstruction from CARS/BCARS spectra."
+  keywords:
+* CARS
+* BCARS
+* Raman spectroscopy
+* coherent Raman
+* phase retrieval
+* Kramers-Kronig
+* maximum entropy method
+* signal processing
+* spectroscopy
+* scientific Python
